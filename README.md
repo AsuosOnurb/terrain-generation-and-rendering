@@ -1,6 +1,6 @@
 # Real-time Rendering of Procedurally Generated Terrain
 
-This is a NAU3D project with GLSL shader implementing procedurally generated terrain.
+This is a NAU3D project with GLSL shaders implementing procedurally generated terrain.
 
 **Features**
 
