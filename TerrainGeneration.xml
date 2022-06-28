@@ -1,0 +1,232 @@
+<?xml version="1.0"?>
+<project name="Terrain Generation" width= 1600 height= 900>
+	<assets>
+		<attributes>
+
+			<attribute name="noise_function" data="INT" type="RENDERER" value=1 />
+			<attribute name="noise_scale" data="FLOAT" type="RENDERER" value=0.2 />
+			<attribute name="noise_octaves" data="INT" type="RENDERER" value=9 />
+			<attribute name="noise_lacunarity" data="FLOAT" type="RENDERER" value=0.45 />
+			<attribute name="noise_exponentiation" data="FLOAT" type="RENDERER" value=2.50 />
+			<attribute name="noise_gain" data="FLOAT" type="RENDERER" value=2.0 />
+			<attribute name="noise_shift" data="FLOAT" type="RENDERER" value=0.8 />
+			<attribute name="noise_height" data="FLOAT" type="RENDERER" value=7.9 />
+
+			<attribute name="apply_dynamic_lod" data="INT" type="RENDERER" value= 0 />
+			<attribute name="tesselation_dist_thresh" data="FLOAT" type="RENDERER" value= 270.0 />
+			<attribute name="max_inner_tesselation" data="INT" type="RENDERER" value= 24 />
+			<attribute name="max_outter_tesselation" data="INT" type="RENDERER" value= 24 />
+
+			<attribute name="easing_function" data="INT" type="RENDERER" value= 0 />
+
+
+			<attribute name="color_coding" data="INT" type="RENDERER" value= 0 />
+			<attribute name="texture_tiling" data="FLOAT" type="RENDERER" value= 0.5 />
+
+			<attribute name="grass_start" data="FLOAT" type="RENDERER" value= "0.2" />
+			<attribute name="rock_start" data="FLOAT" type="RENDERER" value= "0.8" />
+			<attribute name="snow_start" data="FLOAT" type="RENDERER" value= "0.93" />
+			
+			<!--
+			<attribute name="grass_end" data="FLOAT" type="RENDERER" value= 0.01 />
+		
+			<attribute name="dirt_end" data="FLOAT" type="RENDERER" value= 0.6 />
+			<attribute name="rock_end" data="FLOAT" type="RENDERER" value= 2.1 />
+			
+			<attribute name="smoothstep_value" data="FLOAT" type="RENDERER" value= "1" />
+			-->
+			
+			<attribute name="sky_mode" data="INT" type="RENDERER" value= 2 />
+			<attribute name="sun_theta" data="FLOAT" type="RENDERER" value= 1.6 />
+			<attribute name="sun_phi" data="FLOAT" type="RENDERER" value= -1.0 />
+			<attribute name="sun_rho" data="FLOAT" type="RENDERER" value= 500 />
+
+		</attributes>
+
+
+		<scenes>
+
+
+			<!-- Skybox  -->
+			<scene name="Scene_Skybox" type="Scene">
+				<TRANSLATE x= 0 y= 0 z= 0 />
+				<SCALE x= 1000 y= 1000 z= 1000 />
+				<geometry name="SkyDome" type="SPHERE" SLICES= 256 STACKS= 256 material="PredefinedMaterial_Skybox"></geometry>
+			</scene>
+
+			<scene name="Scene_TerrainGrid_Patch_1" type="OctreeByMat">
+				<TRANSLATE x= 0 y= 0 z= 0 />
+				<file name="models/large_quad.patch" />
+			</scene>
+
+
+			<scene name="Scene_WaterGrid">
+				<geometry name="Grid" type="GRID" LENGTH= 2000 DIVISIONS= 64 material="PredefinedMaterial_Water"></geometry>
+			</scene>
+
+
+		</scenes>
+
+		<viewports>
+			<viewport name="MainViewport">
+				<CLEAR_COLOR r="0.69" g="0.56" b="0.56" />
+			</viewport>
+		</viewports>
+
+		<cameras>
+			<camera name="MainCamera">
+				<viewport name="MainViewport" />
+				<NEAR value= 0.1 />
+				<FAR value= 1500 />
+				<POSITION x="0.0" y="3.0" z="0" w="1" />
+				<VIEW x="0.0" y="0.0" z="-1.0" w="0" />
+			</camera>
+		</cameras>
+
+		<lights>
+			<light name="Sun">
+				<DIRECTION x= -2 y= -1 z= -2 />
+			</light>
+		</lights>
+		<materialLibs>
+			<materialLib filename="MaterialLib.mlib" />
+		</materialLibs>
+	</assets>
+
+	<pipelines default="main">
+
+		<pipeline name="main">
+			<!-- Uncomment code below to draw the skybox -->
+			
+			<pass class="default" name="Pass_Skybox">
+				<scenes>
+					<scene name="Scene_Skybox" />
+				</scenes>
+
+				<camera name="MainCamera" />
+
+				<lights>
+					<light name="Sun" />
+				</lights>
+
+				<materialMaps>
+					<map fromMaterial="*" toMaterial="Material_Skybox" toLibrary="MaterialLib" />
+
+				</materialMaps>
+			</pass>
+
+
+			<pass class="default" name="Pass_Terrain">
+				<COLOR_CLEAR value= false />
+				<DEPTH_CLEAR value= false />
+
+				<scenes>
+					<scene name="Scene_TerrainGrid_Patch_1" />
+
+				</scenes>
+
+				<camera name="MainCamera" />
+
+				<lights>
+					<light name="Sun" />
+				</lights>
+
+				<materialMaps>
+					<map fromMaterial="*" toMaterial="Material_Terrain" toLibrary="MaterialLib" />
+				</materialMaps>
+			</pass>
+
+			<!--
+			<pass class="default" name="Pass_Water" >
+				<COLOR_CLEAR value=false />
+				<DEPTH_CLEAR value=false />
+
+				<scenes>
+					<scene name="Scene_WaterGrid" />
+					
+				</scenes>
+
+				<camera name="MainCamera" />
+
+				<lights>
+					<light name="Sun" />
+				</lights>
+			
+				<materialMaps>
+					<map fromMaterial="*" toMaterial="Material_Water" toLibrary="MaterialLib" />
+				</materialMaps>
+			</pass>
+		-->
+
+
+		</pipeline>
+
+
+	</pipelines>
+
+
+	<interface>
+
+		<window label="Noise Settings">
+			<var label="Noise Function" type="RENDERER" context="CURRENT" component="noise_function" strings="Perlin,Simplex,Voronoi" />
+
+
+			<var label="Scale" type="RENDERER" context="CURRENT" component="noise_scale" def="min=0.1 max=1 step=0.5" />
+
+			<var label="Octaves" type="RENDERER" context="CURRENT" component="noise_octaves" def="min=1 max=20 step=1.0" />
+
+			<var label="Lacunarity" type="RENDERER" context="CURRENT" component="noise_lacunarity" def="min=0 max=1 step=0.1" />
+
+			<var label="Exponentiation" type="RENDERER" context="CURRENT" component="noise_exponentiation" def="min=0 max=10 step=0.1" />
+
+			<var label="Gain" type="RENDERER" context="CURRENT" component="noise_gain" def="min=0 max=10 step=0.1" />
+
+			<var label="Shift" type="RENDERER" context="CURRENT" component="noise_shift" def="min=0 max=2 step=0.1" />
+
+			<var label="Height" type="RENDERER" context="CURRENT" component="noise_height" def="min=0 max=50 step=0.5" />
+
+		</window>
+
+		<window label="Tessellation Settings">
+
+			<var label="Dynamic LOD" type="RENDERER" context="CURRENT" component="apply_dynamic_lod" strings="Enabled,Disabled" />
+
+			<var label="Tesselation Distane Threshold" type="RENDERER" context="CURRENT" component="tesselation_dist_thresh" def="min=1 max=2000 step=0.1" />
+
+			<var label="Maximum Outter Tesselation" type="RENDERER" context="CURRENT" component="max_outter_tesselation" def="min=1 max=64 step=1" />
+
+			<var label="Maximum Inner Tesselation" type="RENDERER" context="CURRENT" component="max_inner_tesselation" def="min=1 max=64 step=1" />
+
+			<var label="Easing Funcs." type="RENDERER" context="CURRENT" component="easing_function" strings="OutCirc,OutExpo,OutQuart,OutQuint" />
+
+
+		
+
+		</window>
+
+		<window label="Shading Settings">
+			<var label="Texture Tiling" type="RENDERER" context="CURRENT" component="texture_tiling" def="min=0 max=1 step=0.05" />
+			
+			<var label="Grass Start" type="RENDERER" context="CURRENT" component="grass_start" def="min=0 max=rock_start step=0.05" />
+			<var label="Rock Start" type="RENDERER" context="CURRENT" component="rock_start" def="min=grass_start max=snow_start step=0.05" />
+			<var label="Snow Start" type="RENDERER" context="CURRENT" component="snow_start" def="min=rock_start max=1 step=0.05" />
+			
+			<var label="Color Coding" type="RENDERER" context="CURRENT" component="color_coding" strings="Realistic,Heatmap,Voronoi,DebugNormals" />
+			
+		</window>
+
+		<window label="Sky & Sun Settings">
+
+			<var label="Sky Mode" type="RENDERER" context="CURRENT" component="sky_mode" strings="Dynamic,Static,Toon" />
+			
+			<var label="Theta" type="RENDERER" context="CURRENT" component="sun_theta" def="min=-3 max=3 step=0.01" />
+
+			<var label="Phi" type="RENDERER" context="CURRENT" component="sun_phi" def="min=-3 max=3 step=0.01" />
+
+			<var label="Rho" type="RENDERER" context="CURRENT" component="sun_rho" def="min=0 max=3000 step=0.1" />
+
+		</window>
+	</interface>
+
+
+</project>
