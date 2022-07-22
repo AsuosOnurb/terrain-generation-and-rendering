@@ -3,7 +3,7 @@
 This is a [Nau](https://github.com/Nau3D/nau) project with GLSL shaders implementing procedurally generated terrain. It employs many real-time rendering techniques and allows for many types of terrain (realistic or toon-like, static or animated):
 
 <p align="center">
-    <img src="imgs/ExampleProcedural.gif" width="900" />
+    <img src="imgs/ExampleProcedural.gif" width="700" />
 </p>
 
 
